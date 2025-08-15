@@ -75,7 +75,7 @@ function MediaGallery() {
 
   return (
     <div className="posts">
-      <div className="grid grid-cols-1 gap-4 p-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {media.map((item, index) => (
           <div
             key={item._id?.toString() || index}
@@ -83,6 +83,24 @@ function MediaGallery() {
           >
             {item.type === 'image' ? (
               <>
+                <div className="flex gap-5 p-4 items-center">
+                  <Link href={`/profile/${item.uploadedBy}`}><img
+                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${item.uploadedBy}`}
+                    alt="Profile"
+                    className="w-20 h-20 rounded-full border-2 border-blue-500"
+                  /></Link>
+
+                  <div className="t">
+                    <Link href={`/profile/${item.uploadedBy}`} className='text-emerald-200'>{item.uploadedBy}</Link>
+                    <p className='text-gray-500'>{item.createdAt ? getTimeAgo(item.createdAt.toString()) : 'Date unknown'}</p>
+
+                  </div>
+                </div>
+                <div className="p-4">
+                  {item.caption && (
+                    <p className="mb-2">{item.caption}</p>
+                  )}
+                </div>
                 <img
                   src={item.fileUrl}
                   alt={item.caption || `Image ${index + 1}`}
@@ -92,29 +110,32 @@ function MediaGallery() {
                     console.error('Image failed to load:', item.fileUrl);
                   }}
                 />
-                <div className="p-4">
-                  {item.caption && (
-                    <p className="text-gray-700 mb-2">{item.caption}</p>
-                  )}
-
-                  <Link href={`/profile/${item.uploadedBy}`}>Uploaded by: {item.uploadedBy}</Link>
-                </div>
               </>
             ) : (
               <>
                 <div className="p-4">
-                  {item.title && (
-                    <p className="text-gray-700 mb-2">{item.title}</p>
-                  )}
-                  {item.description && (
-                    <p className="text-gray-500 text-sm mb-2">{item.description}</p>
-                  )}
-                  <p className="text-xs text-gray-500">
-                    Uploaded by: {item.username}
-                  </p>
-                  <p className="text-xs text-gray-500 py-1">
-                    {item.createdAt ? getTimeAgo(item.createdAt.toString()) : 'Date unknown'}
-                  </p>
+
+                  <div className='flex gap-5 p-4 items-center'>
+                    <Link href={`/profile/${item.username}`}><img
+                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${item.username}`}
+                      alt="Profile"
+                      className="w-20 h-20 rounded-full border-2 border-blue-500 "
+                    /></Link>
+
+                    <div className="t text-emerald-200">
+                      <Link href={`/profile/${item.username}`}>{item.username}</Link>
+                      <p className='text-gray-500'>{item.createdAt ? getTimeAgo(item.createdAt.toString()) : 'Date unknown'}</p>
+
+                    </div>
+                  </div>
+                  <div className="text-white p-4">
+                    {item.title && (
+                      <p className="">{item.title}</p>
+                    )}
+                    {item.description && (
+                      <p className="">{item.description}</p>
+                    )}
+                  </div>
                 </div>
                 <video
                   src={item.url}

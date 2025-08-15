@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect } from 'react';
-import PostImage from '../components/postImage';
 import MediaGallery from '@/app/components/mediaGallery';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
@@ -9,12 +8,12 @@ import { useRouter } from 'next/navigation';
 function Dashboard() {
   const router = useRouter()
   const { data: session, status } = useSession()
-  
+
   useEffect(() => {
-      if (status === "unauthenticated") {
-        router.push("/login");
-      }
-    }, [status]);
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status]);
 
 
   if (status === 'loading') {
@@ -23,18 +22,19 @@ function Dashboard() {
 
 
   const handleLogout = async () => {
-    await signOut(
+    const result = await signOut(
       {
-        redirect: false,
+        callbackUrl: "/"
       }
     )
+
   }
 
   return (
-    <div className="mt-8 rounded-lg shadow-md px-60">
+    <div className="dashboard mt-8 rounded-lg shadow-md px-10">
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <Link href={'/dashboard'}><h1 className="text-2xl font-bold">Dashboard</h1></Link>
           <button className="logout cursor-pointer text-gray-600 hover:text-white" onClick={handleLogout}>SignOut</button>
         </div>
 
@@ -51,4 +51,4 @@ function Dashboard() {
   )
 }
 
-export default Dashboard
+export default Dashboard;

@@ -28,7 +28,6 @@ export async function GET(request: NextRequest) {
         .sort({ createdAt: -1 })
         .lean();
     }
-    console.log("USER IMAGES: ", images)
 
     return NextResponse.json(images);
   } catch (error) {
