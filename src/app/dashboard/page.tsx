@@ -9,16 +9,18 @@ import { useRouter } from 'next/navigation';
 function Dashboard() {
   const router = useRouter()
   const { data: session, status } = useSession()
-
-  if (status === 'loading') {
-    return <div className="text-center py-8">Loading...</div>
-  }
-
+  
   useEffect(() => {
       if (status === "unauthenticated") {
         router.push("/login");
       }
     }, [status]);
+
+
+  if (status === 'loading') {
+    return <div className="text-center py-8">Loading...</div>
+  }
+
 
   const handleLogout = async () => {
     await signOut(

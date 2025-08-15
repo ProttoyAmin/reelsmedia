@@ -11,7 +11,7 @@ const imagekit = new ImageKit({
 export async function GET() {
   try {
     const token = uuidv4();
-    const expire = Math.floor(Date.now() / 1000) + 60 * 60;
+    const expire = Math.floor(Date.now() / 1000) + 600;
 
     const authParams = imagekit.getAuthenticationParameters(token, expire);
 

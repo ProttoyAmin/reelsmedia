@@ -75,7 +75,7 @@ function PostImage() {
             fileID: uploadedFile.fileId,
             fileType: file.type,
             fileUrl: uploadedFile.url,
-            uploadedBy: session?.user?.email || '',
+            uploadedBy: session?.user?.username || '',
           }),
         }
       )
