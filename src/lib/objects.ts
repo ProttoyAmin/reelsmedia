@@ -1,7 +1,7 @@
-
 import { IImage } from "@/models/Images";
 import { IVideo } from "@/models/Video";
 import { IUser } from "@/models/User";
+import { IPost } from "@/models/Content";
 
 type FetchOptions = {
   method?: "GET" | "POST" | "PUT" | "DELETE";
@@ -29,12 +29,11 @@ class DataObject {
 
     return response.json();
   }
-
+ 
   async getImages(username?: string): Promise<IImage[]> {
     const params = username ? `?username=${username}` : '';
     return this.fetchData<IImage[]>(`show-image${params}`);
   }
-
 
   async saveImage(imageData: Omit<IImage, "_id" | "createdAt" | "updatedAt">): Promise<IImage> {
     return this.fetchData<IImage>("save-image", {
@@ -50,6 +49,14 @@ class DataObject {
 
   async getUserByUsername(username: string) {
     return this.fetchData<IUser>(`users?username=${username}`);
+  }
+
+  async savePost(content: IPost): Promise<IPost> {
+    return this.fetchData<IPost>('posts', {
+        method: "POST",
+        body: content,
+      }
+    )
   }
 }
 

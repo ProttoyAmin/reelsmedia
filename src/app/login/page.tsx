@@ -21,18 +21,16 @@ function LoginPage() {
 
   const [loggedIn, setloggedIn] = useState(false);
 
-
-
-
   const onSubmit = async (data: FormData) => {
     try {
       const result = await signIn('credentials', {
-        redirect: false,
+        redirect: true,
         email: data.email,
-        password: data.password
+        password: data.password,
+        callbackUrl: '/dashboard'
       })
 
-      setloggedIn(true)
+      setloggedIn(!setloggedIn)
       console.log("Result: ", result)
       console.log("setLoggedIn", loggedIn)
 
@@ -42,7 +40,6 @@ function LoginPage() {
 
       if (result?.url) {
         toast('Login successful!')
-        router.push('/dashboard')
       }
 
     } catch (error: any) {

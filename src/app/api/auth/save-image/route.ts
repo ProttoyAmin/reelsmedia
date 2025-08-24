@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
             { message: "File saved successfully" },
             { status: 200 }
         );
+        
     } catch (error) {
         console.error("Error saving image:", error);
         return NextResponse.json(
