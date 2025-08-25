@@ -9,10 +9,10 @@ import TimelineImages from "./components/TimelineImages";
 import TimelineVideos from "./components/TimelineVideos";
 import TimeLine from "./components/TimeLine";
 import { DataModel } from "@/lib/objects";
-import PostVideo from "@/app/components/videoPost";
-import PostImage from "@/app/components/postImage";
 import { IUser } from "@/models/User";
 import PostContents from "@/app/components/PostContents";
+import ProfilePictureChanger from "./components/ChangePfp";
+import { IProfile } from "@/models/ProfilePicture";
 
 const tabs = ["posts", "photos", "videos"] as const;
 type TabType = typeof tabs[number];
@@ -30,9 +30,10 @@ const ProfilePage = () => {
   console.log("USERNAME: ", username)
   const [profileUser, setProfileUser] = useState<IUser | null>(null);
   const [isCurrentUser, setIsCurrentUser] = useState(false);
+  const [openProfile, setOpenProfile] = useState(false);
+  const [profilePicture, setProfilePicture] = useState<IProfile | null>(null);
 
-  const activeTab = pathname?.includes('photos') ? 'photos' :
-    pathname?.includes('videos') ? 'videos' : 'posts';
+
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -61,6 +62,35 @@ const ProfilePage = () => {
     fetchImages()
   }, [username]);
 
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      if (!username) return;
+
+      setLoading(true);
+      try {
+        const pictureData = await DataModel.getProfilePicture(username);
+        setProfilePicture(pictureData);
+        console.log("Profile Picture URL:", pictureData?.imageUrl);
+      } catch (error) {
+        console.error("Failed to fetch profile picture:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfilePicture();
+  }, [username]);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push('/login');
+    }
+  }, [status, router]);
+
+
+  const activeTab = pathname?.includes('photos') ? 'photos' :
+    pathname?.includes('videos') ? 'videos' : 'posts';
+
   const handleTabClick = (tab: TabType) => {
     if (tab === 'posts') {
       router.push(`/profile/${profileUser?.username}`);
@@ -69,8 +99,26 @@ const ProfilePage = () => {
     }
   };
 
-  if (status === "loading") return <div className="text-center mt-10">Loading...</div>;
-  if (status === "unauthenticated") return <div className="text-center mt-10">Please login to view your profile.</div>;
+  const handleProfilePicture = () => {
+    setOpenProfile(true)
+  }
+
+  if (status === "loading") return <div className="text-center mt-10"><div className="flex w-full h-0.5">
+    <div className="relative w-full overflow-hidden">
+      <div className="absolute left-0 top-0 h-0.5 w-full bg-gradient-to-r from-blue-500 via-gray-500 to-blue-500 animate-[progress_2s_linear_infinite]"></div>
+    </div>
+    <style>
+      {`
+          @keyframes progress {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+          }
+        `}
+    </style>
+  </div></div>;
+
+
+
   console.log("current user: ", isCurrentUser)
   if (loading) {
     return (
@@ -96,10 +144,12 @@ const ProfilePage = () => {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex items-center space-x-4 mb-10">
           <img
-            src={`https://api.dicebear.com/7.x/initials/svg?seed=${profileUser?.username}`}
+            onClick={handleProfilePicture}
+            src={profilePicture?.imageUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${profileUser?.username}`}
             alt="Profile"
-            className="w-20 h-20 rounded-full border-2 border-blue-500"
+            className="w-20 h-20 rounded-full border-2 border-blue-500 object-cover"
           />
+
           <div>
             <h1 className="text-2xl font-bold text-gray-800">{profileUser?.username}</h1>
             <p className="text-gray-500 text-sm">{profileUser?.email}</p>
@@ -121,21 +171,31 @@ const ProfilePage = () => {
           ))}
         </div>
 
-        <PostContents />
+        {
+          openProfile && (
+            <ProfilePictureChanger
+              openProfile={openProfile}
+              setOpenProfile={setOpenProfile}
+            />
+          )
+        }
+
 
         <div className="mt-4">
           {activeTab === "posts" && (
             <div>
               <h2 className="text-xl font-semibold text-gray-700 mb-6">Your Timeline</h2>
               {isCurrentUser && (
-                <div className="post flex gap-2.5 justify-around">
-                  <div className="w-1/2">
-                    <PostVideo />
-                  </div>
-                  <div className="w-1/2">
-                    <PostImage />
-                  </div>
-                </div>
+                // <div className="post flex gap-2.5 justify-around">
+                //   <div className="w-1/2">
+                //     <PostVideo />
+                //   </div>
+                //   <div className="w-1/2">
+                //     <PostImage />
+                //   </div>
+                // </div>
+                <PostContents />
+
               )}
               <TimeLine params={username} />
             </div>

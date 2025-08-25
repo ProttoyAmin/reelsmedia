@@ -4,26 +4,17 @@ export type MediaType = 'image' | 'video';
 export type ContentType = 'status' | 'image' | 'video';
 export type PrivacyType = 'public' | 'friends' | 'private';
 
-export type FormData = {
-  contentType: "status" | "image" | "video";
-  media?: FileList;
-  text?: string;
-  tags?: string[];
-  privacy?: "public" | "friends" | "private";
-  mediaType?: "image" | "video";
-};
-
 export interface IPost extends mongoose.Document {
     contentType: ContentType;
     text?: string;
     mediaUrl?: string;
     mediaType?: MediaType;
-    createdBy: mongoose.Types.ObjectId;
+    createdBy: string;
     createdAt?: Date;
     updatedAt?: Date;
-    likes: mongoose.Types.ObjectId[];
-    comments: mongoose.Types.ObjectId[];
-    tags: string[];
+    likes?: mongoose.Types.ObjectId[];
+    comments?: mongoose.Types.ObjectId[];
+    tags?: string[];
     privacy: PrivacyType;
 }
 
@@ -52,8 +43,7 @@ const PostSchema: mongoose.Schema = new mongoose.Schema<IPost>(
             }
         },
         createdBy: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
+            type: String,  // Changed to ObjectId
             required: true
         },
         likes: [{
