@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@imagekit/next": "^2.1.2",
+    "@material-tailwind/react": "^2.1.10",
     "imagekit": "^6.0.0",
     "lucide-react": "^0.536.0",
     "mongoose": "^8.17.0",

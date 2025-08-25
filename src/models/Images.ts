@@ -16,7 +16,6 @@ export interface IImage {
     updatedAt?: Date;
 }
 
-
 const ImageSchema = new mongoose.Schema<IImage>(
     {
         caption: {

@@ -19,9 +19,8 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Find user by username (case insensitive)
         const user = await User.findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } })
-            .select('-password -__v') // Exclude sensitive/uneeded fields
+            .select('-password -__v')
             .lean();
 
         console.log("UserDetails:", user)

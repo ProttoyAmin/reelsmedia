@@ -12,6 +12,7 @@ import { DataModel } from "@/lib/objects";
 import PostVideo from "@/app/components/videoPost";
 import PostImage from "@/app/components/postImage";
 import { IUser } from "@/models/User";
+import PostContents from "@/app/components/PostContents";
 
 const tabs = ["posts", "photos", "videos"] as const;
 type TabType = typeof tabs[number];
@@ -22,6 +23,7 @@ const ProfilePage = () => {
   const { data: session, status } = useSession();
   const [images, setImages] = useState<IImage[]>([]);
   const [videos, setVideos] = useState<IVideo[]>([]);
+  const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
   const username = params?.username as string;
@@ -42,19 +44,22 @@ const ProfilePage = () => {
 
     const fetchImages = async () => {
       try {
+        setLoading(true)
         const VidData = await DataModel.getVideos(username)
         const data = await DataModel.getImages(username);
-        console.log("IMAGES",data)
-        console.log("VIDEOSSS",VidData)
+        console.log("IMAGES", data)
+        console.log("VIDEOSSS", VidData)
         setVideos(VidData);
         setImages(data);
       } catch (err) {
         console.error("Failed to load images:", err);
+      } finally {
+        setLoading(false)
       }
     };
     loadProfile();
     fetchImages()
-  }, [username, session]);
+  }, [username]);
 
   const handleTabClick = (tab: TabType) => {
     if (tab === 'posts') {
@@ -67,6 +72,24 @@ const ProfilePage = () => {
   if (status === "loading") return <div className="text-center mt-10">Loading...</div>;
   if (status === "unauthenticated") return <div className="text-center mt-10">Please login to view your profile.</div>;
   console.log("current user: ", isCurrentUser)
+  if (loading) {
+    return (
+      <div className="flex w-full h-0.5">
+        <div className="relative w-full overflow-hidden">
+          <div className="absolute left-0 top-0 h-0.5 w-full bg-gradient-to-r from-blue-500 via-gray-500 to-blue-500 animate-[progress_2s_linear_infinite]"></div>
+        </div>
+        <style>
+          {`
+          @keyframes progress {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+          }
+        `}
+        </style>
+      </div>
+    );
+  }
+
   return (
     <>
       <Link href={'/dashboard'} className="ml-4 text-blue-600 hover:underline">← Go to Dashboard</Link>
@@ -98,6 +121,8 @@ const ProfilePage = () => {
           ))}
         </div>
 
+        <PostContents />
+
         <div className="mt-4">
           {activeTab === "posts" && (
             <div>
@@ -112,11 +137,11 @@ const ProfilePage = () => {
                   </div>
                 </div>
               )}
-              <TimeLine params={username}/>
+              <TimeLine params={username} />
             </div>
           )}
           {activeTab === "photos" && <TimelineImages images={images} />}
-          {activeTab === "videos" && <TimelineVideos videos={videos}/>}
+          {activeTab === "videos" && <TimelineVideos videos={videos} />}
         </div>
       </div>
     </>

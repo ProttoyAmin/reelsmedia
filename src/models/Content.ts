@@ -1,8 +1,17 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 export type MediaType = 'image' | 'video';
 export type ContentType = 'status' | 'image' | 'video';
 export type PrivacyType = 'public' | 'friends' | 'private';
+
+export type FormData = {
+  contentType: "status" | "image" | "video";
+  media?: FileList;
+  text?: string;
+  tags?: string[];
+  privacy?: "public" | "friends" | "private";
+  mediaType?: "image" | "video";
+};
 
 export interface IPost extends mongoose.Document {
     contentType: ContentType;
@@ -72,5 +81,5 @@ const PostSchema: mongoose.Schema = new mongoose.Schema<IPost>(
     }
 );
 
-const Post = mongoose.models?.Post || mongoose.model<IPost>('Video', PostSchema, 'Posts');
+const Post = mongoose.models?.Post || mongoose.model<IPost>('Post', PostSchema, 'Posts');
 export default Post;
