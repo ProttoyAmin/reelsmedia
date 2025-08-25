@@ -54,10 +54,10 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
-        console.log("searchParams:::", searchParams)
+        console.log("searchParams:", searchParams)
         const username = searchParams.get('username');
-        console.log("Username::::", username)
-        
+        console.log("Username:", username)
+
         if (!username) {
             return NextResponse.json(
                 { error: "Username is required" },
@@ -66,17 +66,9 @@ export async function GET(request: NextRequest) {
         }
 
         await connectToDatabase();
-
         const data = await ProfilePicture.findOne({ takenBy: username });
 
         console.log("Profile Image data: ", data);
-
-        if (!data) {
-            return NextResponse.json(
-                { message: "No profile picture found" },
-                { status: 404 }
-            );
-        }
 
         return NextResponse.json(data);
 

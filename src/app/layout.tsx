@@ -29,16 +29,17 @@ export default function RootLayout({
 
   return (
     <>
+        <Providers>
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased my-20`}
         >
-          <Providers>
-            <Navbar />
+        <Navbar />
+
             {children}
-          </Providers>
         </body>
       </html>
+          </Providers>
     </>
   );
 }

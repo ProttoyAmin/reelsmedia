@@ -1,5 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { DataModel } from '@/lib/objects';
+import { upload } from '@imagekit/next';
+import { useSession } from 'next-auth/react';
+import { IProfile } from '@/models/ProfilePicture';
 
 interface ProfilePictureChangerProps {
   openProfile: boolean;
@@ -16,6 +19,7 @@ const ProfilePictureChanger: React.FC<ProfilePictureChangerProps> = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { data: session } = useSession()
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -39,7 +43,7 @@ const ProfilePictureChanger: React.FC<ProfilePictureChangerProps> = ({
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     const file = e.dataTransfer.files?.[0];
     if (file && file.type.startsWith('image/')) {
       setSelectedImage(file);
@@ -52,12 +56,48 @@ const ProfilePictureChanger: React.FC<ProfilePictureChangerProps> = ({
     if (selectedImage) {
       const formData = new FormData();
       formData.append('profilePicture', selectedImage);
-      
+
       console.log('Profile picture dataaaaa:', selectedImage);
-      
-      
+
+      try {
+        const authParams = await fetch('/api/auth/imagekit-auth')
+        const { token, expire, signature, publicKey } = await authParams.json();
+
+        const uploadedFile = await upload({
+          file: selectedImage,
+          fileName: selectedImage.name,
+          expire: expire,
+          token: token,
+          publicKey: publicKey,
+          signature: signature,
+          folder: '/ProfilePictures',
+        })
+
+        console.log("SUCCESSFULLY UPLOADED: ", uploadedFile)
+
+        const imageData: IProfile = {
+          imageUrl: uploadedFile.url!,
+          takenBy: session?.user.username!
+        }
+
+        const result = await DataModel.saveProfile(imageData)
+        console.log("Posted to MONGODB : ", result)
+
+
+      } catch (error) {
+        console.error
+      } finally {
+        setOpenProfile(false);
+        setSelectedImage(null);
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+        }
+        setPreviewUrl(null);
+      }
+
+
       setOpenProfile(false);
-      
+
       setSelectedImage(null);
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
@@ -81,7 +121,7 @@ const ProfilePictureChanger: React.FC<ProfilePictureChangerProps> = ({
     } else {
       document.body.style.overflow = 'unset';
     }
-    
+
     return () => {
       document.body.style.overflow = 'unset';
     };
@@ -91,13 +131,13 @@ const ProfilePictureChanger: React.FC<ProfilePictureChangerProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={handleClose}>
-      <div 
+      <div
         className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-800">Change Profile Picture</h2>
-          <button 
+          <button
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
@@ -106,10 +146,10 @@ const ProfilePictureChanger: React.FC<ProfilePictureChangerProps> = ({
             </svg>
           </button>
         </div>
-        
+
         <div className="p-6">
           <div className="flex flex-col items-center mb-6">
-            <div 
+            <div
               className={`w-32 h-32 rounded-full mb-4 overflow-hidden border-2 ${isDragging ? 'border-blue-500 border-dashed' : 'border-gray-200'} flex items-center justify-center transition-colors cursor-pointer`}
               onClick={() => fileInputRef.current?.click()}
               onDragOver={handleDragOver}
@@ -117,24 +157,24 @@ const ProfilePictureChanger: React.FC<ProfilePictureChangerProps> = ({
               onDrop={handleDrop}
             >
               {previewUrl ? (
-                <img 
-                  src={previewUrl} 
-                  alt="Preview" 
+                <img
+                  src={previewUrl}
+                  alt="Preview"
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <img 
-                  src={currentProfilePic} 
-                  alt="Current profile" 
+                <img
+                  src={currentProfilePic}
+                  alt="Current profile"
                   className="w-full h-full object-cover"
                 />
               )}
             </div>
-            
+
             <p className="text-gray-600 text-center mb-4">
               {isDragging ? 'Drop your image here' : 'Click to upload or drag and drop'}
             </p>
-            
+
             <input
               type="file"
               ref={fileInputRef}
@@ -142,7 +182,7 @@ const ProfilePictureChanger: React.FC<ProfilePictureChangerProps> = ({
               accept="image/*"
               className="hidden"
             />
-            
+
             <button
               onClick={() => fileInputRef.current?.click()}
               className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
@@ -150,12 +190,12 @@ const ProfilePictureChanger: React.FC<ProfilePictureChangerProps> = ({
               Select Image
             </button>
           </div>
-          
+
           <p className="text-sm text-gray-500 text-center mb-6">
             Recommended: Square JPG or PNG, at least 200x200 pixels
           </p>
         </div>
-        
+
         <div className="flex justify-end space-x-3 p-6 bg-gray-50 rounded-b-xl">
           <button
             onClick={handleClose}

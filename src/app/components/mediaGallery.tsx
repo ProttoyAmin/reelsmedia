@@ -4,6 +4,8 @@ import { DataModel } from '@/lib/objects';
 import { IVideo } from '@/models/Video';
 import getTimeAgo from '@/hooks/timeConvert';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { IProfile } from '@/models/ProfilePicture';
 
 type MediaItem =
   | ({ type: 'image' } & IImage)
@@ -13,6 +15,28 @@ function MediaGallery() {
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const {data: session } = useSession();
+  const [profilePicture, setProfilePicture] = useState<IProfile | null>(null);
+  const username = session?.user.username
+
+  useEffect(() => {
+      const fetchProfilePicture = async () => {
+        if (!username) return;
+  
+        setLoading(true);
+        try {
+          const pictureData = await DataModel.getProfilePicture(username);
+          setProfilePicture(pictureData);
+          console.log("Profile Picture URL:", pictureData?.imageUrl);
+        } catch (error) {
+          console.error("Failed to fetch profile picture:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchProfilePicture();
+    }, [username]);
 
   useEffect(() => {
     const fetchMedia = async () => {

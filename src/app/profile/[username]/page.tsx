@@ -13,6 +13,7 @@ import { IUser } from "@/models/User";
 import PostContents from "@/app/components/PostContents";
 import ProfilePictureChanger from "./components/ChangePfp";
 import { IProfile } from "@/models/ProfilePicture";
+import Navbar from "@/app/components/Navbar";
 
 const tabs = ["posts", "photos", "videos"] as const;
 type TabType = typeof tabs[number];
@@ -140,6 +141,7 @@ const ProfilePage = () => {
 
   return (
     <>
+
       <Link href={'/dashboard'} className="ml-4 text-blue-600 hover:underline">← Go to Dashboard</Link>
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex items-center space-x-4 mb-10">
