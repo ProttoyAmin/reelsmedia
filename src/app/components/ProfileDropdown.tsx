@@ -50,7 +50,7 @@ const ProfileDropdown = () => {
     await signOut(
       {
         redirect: true,
-        callbackUrl: "/"
+        callbackUrl: "/login"
       }
     )
   };

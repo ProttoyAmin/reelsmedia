@@ -13,7 +13,6 @@ import { IUser } from "@/models/User";
 import PostContents from "@/app/components/PostContents";
 import ProfilePictureChanger from "./components/ChangePfp";
 import { IProfile } from "@/models/ProfilePicture";
-import Navbar from "@/app/components/Navbar";
 
 const tabs = ["posts", "photos", "videos"] as const;
 type TabType = typeof tabs[number];
