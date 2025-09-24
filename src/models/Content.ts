@@ -43,7 +43,7 @@ const PostSchema: mongoose.Schema = new mongoose.Schema<IPost>(
             }
         },
         createdBy: {
-            type: String,  // Changed to ObjectId
+            type: String,
             required: true
         },
         likes: [{
